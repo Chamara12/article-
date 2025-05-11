@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { MongoStorage } from "./mongoStorage";
 import fs from "fs/promises";
 import path from "path";
 import dotenv from "dotenv";
@@ -10,6 +10,9 @@ import { generateXAIArticle } from "./ai/xai";
 import { z } from "zod";
 
 dotenv.config();
+
+// Initialize MongoDB storage for articles
+export const mongoStorage = new MongoStorage();
 
 // Load prompts from files
 async function loadPrompt(promptName: string): Promise<string> {
@@ -26,6 +29,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Load prompts on startup
   const articlePromptPromise = loadPrompt('article');
   const humanizePromptPromise = loadPrompt('humanize');
+  
+  // Reference to storage
+  const storage = mongoStorage;
 
   // API endpoint for generating articles
   app.post('/api/articles/generate', async (req, res) => {
@@ -76,7 +82,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contentWithoutTags = articleContent.replace(/<[^>]*>/g, ' ');
       const wordCount = contentWithoutTags.split(/\s+/).filter(Boolean).length;
 
-      // Store the article in memory
+      // Store the article in MongoDB
       const article = await storage.createArticle({
         title,
         content: articleContent,
