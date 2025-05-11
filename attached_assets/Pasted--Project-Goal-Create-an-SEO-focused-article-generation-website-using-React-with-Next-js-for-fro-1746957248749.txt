@@ -1,0 +1,108 @@
+🔧 Project Goal
+Create an SEO-focused article generation website using React (with Next.js) for frontend and Python for backend. The site will allow users to generate SEO-optimized articles based on provided prompts and will include an admin panel for API key management.
+
+🧱 Tech Stack
+Frontend: React + Next.js
+
+Backend: Python (API only)
+
+Database: None required
+
+Article Format: HTML
+
+Prompt Storage: .txt files in prompt/ folder
+
+🎨 Design Guidelines
+Full-width Max (PC): 1160px
+
+Color Palette:
+
+Main Color: #9324f9
+
+Background: #111111
+
+No other colors allowed.
+
+Styling:
+
+Use one single global style file to manage all colors, fonts, and layout styling.
+
+No fallback content, shadows, or unnecessary effects.
+
+Sidebar:
+
+Toggle sidebar like Claude AI.
+
+Sidebar is always ON by default (can toggle but not close entirely).
+
+UI/UX:
+
+Very clear, modern full-page layout.
+
+Minimal, compact input forms like ChatGPT input.
+
+📁 File & Folder Structure (100% clear)
+
+🧠 Prompt Handling
+Prompts stored as .txt in prompts/ folder.
+
+Use two prompts:
+
+article.txt
+
+humanize.txt
+
+Do not embed prompts directly in code.
+
+📝 Article Generation Input Form
+Fields:
+
+Primary Keyword (required)
+
+Secondary Keywords (comma separated)
+
+Word Count (default: 200)
+
+Tone
+
+Point of View
+
+Target Audience (optional)
+
+Toggle Humanize Article
+
+Use compact, minimal input layout.
+
+After input, user is redirected to:
+
+Page: /article/:id
+
+Render article in HTML format (use h1, p, ul, etc.)
+
+Critical Requirement: Output must be ±10% of the user-provided word count.
+
+🧩 Admin Panel
+Path: /admin
+
+Features:
+
+View and Change AI API keys
+
+No add/remove options, just update.
+
+Do not hardcode keys.
+
+Use .env for keys:
+
+makefile
+Copy
+Edit
+CHATGPT_API_KEY=
+ANTHROPIC_API_KEY=
+XAI_API_KEY=
+🤖 AI Model Handling
+Support multiple AI models (e.g., ChatGPT, Claude, x.ai).
+
+Automatically detect which model to use based on endpoint.
+
+Allow user to select model from dropdown in the input form.
