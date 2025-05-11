@@ -2,6 +2,7 @@ import { Switch, Route } from "wouter";
 import Home from "@/pages/Home";
 import Article from "@/pages/Article";
 import Admin from "@/pages/Admin";
+import History from "@/pages/History";
 import NotFound from "@/pages/not-found";
 import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
@@ -34,6 +35,7 @@ function App() {
           <Route path="/" component={Home} />
           <Route path="/article/:id" component={Article} />
           <Route path="/admin" component={Admin} />
+          <Route path="/history" component={History} />
           <Route component={NotFound} />
         </Switch>
       </div>

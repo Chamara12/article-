@@ -42,6 +42,19 @@ export default function Sidebar({ expanded, toggleSidebar }: SidebarProps) {
             </li>
             <li className="mb-2">
               <Link
+                href="/history"
+                className={`flex items-center px-4 py-3 rounded-md text-white transition ${
+                  location === "/history"
+                    ? "bg-primary bg-opacity-20 hover:bg-opacity-30"
+                    : "hover:bg-gray-800"
+                }`}
+              >
+                <i className="fas fa-history mr-3"></i>
+                <span>Article History</span>
+              </Link>
+            </li>
+            <li className="mb-2">
+              <Link
                 href="/admin"
                 className={`flex items-center px-4 py-3 rounded-md text-white transition ${
                   location === "/admin"
