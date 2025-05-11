@@ -78,7 +78,9 @@ export async function generateAnthropicArticle(
         ]
       });
       
-      articleContent = humanizedResponse.content[0].text;
+      if (humanizedResponse.content[0].type === 'text') {
+        articleContent = humanizedResponse.content[0].text;
+      }
       
       // Track API usage for the humanize step
       const humanizeInputTokensEstimate = humanizeFilledPrompt.length / 4;
