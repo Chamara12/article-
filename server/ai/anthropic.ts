@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { mongoStorage } from "../routes";
 
 // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
 const MODEL = "claude-3-7-sonnet-20250219";
@@ -48,7 +49,18 @@ export async function generateAnthropicArticle(
       ]
     });
     
-    let articleContent = response.content[0].text;
+    let articleContent = '';
+    if (response.content[0].type === 'text') {
+      articleContent = response.content[0].text;
+    }
+    
+    // Track API usage (estimate tokens - more accurate would be to use Claude's usage tracking)
+    const inputTokensEstimate = filledPrompt.length / 4; // rough estimate
+    const outputTokensEstimate = articleContent.length / 4; // rough estimate
+    const tokensUsed = Math.ceil(inputTokensEstimate + outputTokensEstimate);
+    
+    // Track the API usage
+    await mongoStorage.trackApiUsage('claude', tokensUsed);
     
     // If humanize is enabled, run the content through another prompt
     if (params.humanize && articleContent) {
@@ -67,6 +79,14 @@ export async function generateAnthropicArticle(
       });
       
       articleContent = humanizedResponse.content[0].text;
+      
+      // Track API usage for the humanize step
+      const humanizeInputTokensEstimate = humanizeFilledPrompt.length / 4;
+      const humanizeOutputTokensEstimate = articleContent.length / 4;
+      const humanizeTokensUsed = Math.ceil(humanizeInputTokensEstimate + humanizeOutputTokensEstimate);
+      
+      // Track the API usage
+      await mongoStorage.trackApiUsage('claude', humanizeTokensUsed);
     }
     
     return articleContent;

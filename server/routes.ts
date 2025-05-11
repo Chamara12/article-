@@ -173,6 +173,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+  
+  // API endpoint for retrieving all articles
+  app.get('/api/articles', async (_req, res) => {
+    try {
+      const articles = await storage.getAllArticles();
+      res.json(articles);
+    } catch (error: any) {
+      console.error('Error retrieving articles:', error);
+      res.status(500).json({ 
+        message: error.message || 'Failed to retrieve articles' 
+      });
+    }
+  });
+  
+  // API endpoint for retrieving API usage statistics
+  app.get('/api/admin/usage', async (req, res) => {
+    try {
+      // Get query parameters for date filtering
+      const { startDate, endDate } = req.query;
+      
+      // Get API usage data
+      const usageData = await storage.getApiUsage(
+        startDate as string | undefined, 
+        endDate as string | undefined
+      );
+      
+      // Group by model
+      const usageByModel: Record<string, any> = {};
+      
+      for (const record of usageData) {
+        if (!usageByModel[record.model]) {
+          usageByModel[record.model] = {
+            model: record.model,
+            totalTokens: 0,
+            totalRequests: 0,
+            dailyUsage: []
+          };
+        }
+        
+        usageByModel[record.model].totalTokens += record.tokens;
+        usageByModel[record.model].totalRequests += record.requests;
+        usageByModel[record.model].dailyUsage.push({
+          date: record.date,
+          tokens: record.tokens,
+          requests: record.requests
+        });
+      }
+      
+      res.json({
+        summary: Object.values(usageByModel),
+        detailed: usageData
+      });
+    } catch (error: any) {
+      console.error('Error retrieving API usage:', error);
+      res.status(500).json({ 
+        message: error.message || 'Failed to retrieve API usage data' 
+      });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
