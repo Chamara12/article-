@@ -34,5 +34,20 @@ export const insertArticleSchema = createInsertSchema(articles).omit({
   id: true,
 });
 
+// Define a type-safe schema for our MongoDB Article objects
+export const articleSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  content: z.string(),
+  date: z.string(),
+  wordCount: z.number(),
+  primaryKeyword: z.string(),
+  secondaryKeywords: z.string().nullable(),
+  tone: z.string(),
+  model: z.string(),
+  pov: z.string(),
+  targetAudience: z.string().nullable()
+});
+
 export type InsertArticle = z.infer<typeof insertArticleSchema>;
-export type Article = typeof articles.$inferSelect;
+export type Article = z.infer<typeof articleSchema>;

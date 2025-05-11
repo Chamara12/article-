@@ -1,6 +1,7 @@
-import { IStorage } from './storage';
+import { IStorage, ApiUsageRecord } from './storage';
 import { User, InsertUser, Article, InsertArticle } from '@shared/schema';
 import ArticleModel from './models/Article';
+import ApiUsageModel from './models/ApiUsage';
 import { storage as memStorage } from './storage';
 import { log } from './vite';
 import mongoose from 'mongoose';
@@ -132,6 +133,111 @@ export class MongoStorage implements IStorage {
       // Fall back to memory storage on error
       log('Falling back to memory storage for createArticle', 'storage');
       return memStorage.createArticle(sanitizedData);
+    }
+  }
+  
+  async getAllArticles(): Promise<Article[]> {
+    // If MongoDB is not connected, use memory storage
+    if (!this.isConnected) {
+      log('MongoDB not connected, using memory storage for getAllArticles', 'storage');
+      return memStorage.getAllArticles();
+    }
+    
+    try {
+      const articles = await ArticleModel.find().sort({ _id: -1 }).exec();
+      
+      // Convert MongoDB documents to our Article type
+      return articles.map((article, index) => ({
+        id: index + 1,
+        title: article.title,
+        content: article.content,
+        date: article.date,
+        wordCount: article.wordCount,
+        primaryKeyword: article.primaryKeyword,
+        secondaryKeywords: article.secondaryKeywords || null,
+        tone: article.tone,
+        model: article.modelType, // Map modelType to model for our API
+        pov: article.pov,
+        targetAudience: article.targetAudience || null,
+      } as Article));
+    } catch (error) {
+      log(`Error fetching articles from MongoDB: ${error}`, 'storage');
+      // Fall back to memory storage on error
+      log('Falling back to memory storage for getAllArticles', 'storage');
+      return memStorage.getAllArticles();
+    }
+  }
+  
+  async trackApiUsage(model: string, tokens: number): Promise<void> {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // If MongoDB is not connected, use memory storage
+    if (!this.isConnected) {
+      log('MongoDB not connected, using memory storage for trackApiUsage', 'storage');
+      return memStorage.trackApiUsage(model, tokens);
+    }
+    
+    try {
+      // Try to find and update existing record for today and model
+      const result = await ApiUsageModel.findOneAndUpdate(
+        { date: today, model },
+        { $inc: { tokens, requests: 1 } },
+        { new: true, upsert: false }
+      );
+      
+      // If no record exists, create a new one
+      if (!result) {
+        const newUsage = new ApiUsageModel({
+          model,
+          tokens,
+          requests: 1,
+          date: today
+        });
+        await newUsage.save();
+      }
+    } catch (error) {
+      log(`Error tracking API usage in MongoDB: ${error}`, 'storage');
+      // Fall back to memory storage on error
+      log('Falling back to memory storage for trackApiUsage', 'storage');
+      return memStorage.trackApiUsage(model, tokens);
+    }
+  }
+  
+  async getApiUsage(startDate?: string, endDate?: string): Promise<ApiUsageRecord[]> {
+    // If MongoDB is not connected, use memory storage
+    if (!this.isConnected) {
+      log('MongoDB not connected, using memory storage for getApiUsage', 'storage');
+      return memStorage.getApiUsage(startDate, endDate);
+    }
+    
+    try {
+      // Create a MongoDB query
+      let query: any = {};
+      
+      if (startDate || endDate) {
+        query.date = {};
+        if (startDate) {
+          query.date['$gte'] = startDate;
+        }
+        if (endDate) {
+          query.date['$lte'] = endDate;
+        }
+      }
+      
+      const usageData = await ApiUsageModel.find(query).sort({ date: -1 }).exec();
+      
+      // Convert MongoDB documents to our ApiUsageRecord type
+      return usageData.map(usage => ({
+        model: usage.model,
+        tokens: usage.tokens,
+        requests: usage.requests,
+        date: usage.date
+      }));
+    } catch (error) {
+      log(`Error fetching API usage from MongoDB: ${error}`, 'storage');
+      // Fall back to memory storage on error
+      log('Falling back to memory storage for getApiUsage', 'storage');
+      return memStorage.getApiUsage(startDate, endDate);
     }
   }
 }
