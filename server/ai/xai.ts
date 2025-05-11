@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { mongoStorage } from "../routes";
 
 // Using Grok-2 model for text generation
 const MODEL = "grok-2-1212";
@@ -51,6 +52,14 @@ export async function generateXAIArticle(
     
     let articleContent = completion.choices[0].message.content || "";
     
+    // Track API usage (estimate tokens - more accurate would be to use tiktoken)
+    const inputTokensEstimate = filledPrompt.length / 4; // rough estimate
+    const outputTokensEstimate = articleContent.length / 4; // rough estimate
+    const tokensUsed = Math.ceil(inputTokensEstimate + outputTokensEstimate);
+    
+    // Track the API usage
+    await mongoStorage.trackApiUsage('xai', tokensUsed);
+    
     // If humanize is enabled, run the content through another prompt
     if (params.humanize && articleContent) {
       const humanizeFilledPrompt = humanizePrompt
@@ -68,6 +77,14 @@ export async function generateXAIArticle(
       });
       
       articleContent = humanizedCompletion.choices[0].message.content || articleContent;
+      
+      // Track API usage for the humanize step
+      const humanizeInputTokensEstimate = humanizeFilledPrompt.length / 4;
+      const humanizeOutputTokensEstimate = articleContent.length / 4;
+      const humanizeTokensUsed = Math.ceil(humanizeInputTokensEstimate + humanizeOutputTokensEstimate);
+      
+      // Track the API usage
+      await mongoStorage.trackApiUsage('xai', humanizeTokensUsed);
     }
     
     return articleContent;
