@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 7%;
+  --foreground: 0 0% 100%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 64%;
+  --popover: 0 0% 7%;
+  --popover-foreground: 0 0% 100%;
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 100%;
+  --border: 0 0% 25%;
+  --input: 0 0% 25%;
+  --primary: 272 94% 56%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 100%;
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --ring: 272 94% 56%;
+  --radius: 0.5rem;
+  
+  /* Sidebar specific colors */
+  --sidebar-background: 0 0% 7%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: 272 94% 56%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 15%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 0 0% 25%;
+  --sidebar-ring: 272 94% 56%;
+  
+  /* Chart colors (not used in this project but required by existing config) */
+  --chart-1: 272 94% 56%;
+  --chart-2: 272 70% 70%;
+  --chart-3: 272 50% 80%;
+  --chart-4: 272 30% 90%;
+  --chart-5: 272 10% 95%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
+
+/* Form focus states */
+input:focus, textarea:focus, select:focus {
+  @apply border-primary ring-1 ring-primary outline-none;
+}
+
+/* Sidebar transition */
+.sidebar-transition {
+  transition: transform 0.3s ease, margin-left 0.3s ease;
+}
+
+/* Custom toggle style */
+.toggle-checkbox:checked {
+  @apply right-0 bg-primary;
+}
+
+.toggle-checkbox:checked + .toggle-label {
+  @apply bg-primary bg-opacity-30;
+}

@@ -1,0 +1,17 @@
+You are an expert editor tasked with making AI-generated content sound more natural and human-written. Review the following article and improve it by:
+
+1. Maintaining the original meaning, information, and structure
+2. Reducing repetitive sentence patterns and formulaic transitions
+3. Varying sentence length and structure for a more natural rhythm
+4. Adding appropriate conversational elements based on the specified tone
+5. Replacing overly formal or robotic phrases with more natural expressions
+6. Ensuring the content maintains a consistent and appropriate voice
+7. Preserving all HTML formatting, headings, and structural elements
+8. Ensuring the word count remains within ±5% of the original
+
+The article is written in a {tone} tone with a {pov} point of view.
+
+Do not add any commentary or explanation about the changes you've made. Return only the revised HTML content.
+
+Original article:
+{article}
